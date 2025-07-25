@@ -7,7 +7,20 @@ from staff_commands import staff_system
 
 def setup_bot_commands(tree: app_commands.CommandTree, client: discord.Client):
     
-    # --- NOVO COMANDO PARA STATUS PERSONALIZADO ---
+    # --- NOVO COMANDO DE SINCRONIZAÇÃO ---
+    @tree.command(name="sync", description="👑 [Dono] Sincroniza os comandos com o Discord.")
+    async def sync(interaction: discord.Interaction):
+        if not staff_system.is_staff(interaction.user):
+            await interaction.response.send_message("❌ Apenas membros da Staff podem usar este comando.", ephemeral=True)
+            return
+        
+        await interaction.response.defer(ephemeral=True, thinking=True)
+        try:
+            synced = await tree.sync()
+            await interaction.followup.send(f"✅ Sincronizados {len(synced)} comandos com sucesso.")
+        except Exception as e:
+            await interaction.followup.send(f"❌ Falha ao sincronizar comandos: {e}")
+
     @tree.command(name="customstatus", description="👑 [Dono] Define um status personalizado para o bot.")
     @app_commands.describe(
         texto="A mensagem que aparecerá no status.",
@@ -18,17 +31,14 @@ def setup_bot_commands(tree: app_commands.CommandTree, client: discord.Client):
             return await interaction.response.send_message("❌ Apenas membros da Staff podem usar este comando.", ephemeral=True)
             
         try:
-            # Pega o status atual para não alterá-lo (Online, Ausente, etc)
             current_status_str = bot_config.get_presence().get('status', 'online')
             status_map = {"online": discord.Status.online, "idle": discord.Status.idle, "dnd": discord.Status.dnd, "invisible": discord.Status.invisible}
             current_status = status_map.get(current_status_str, discord.Status.online)
             
-            # Cria a atividade personalizada
             activity = discord.CustomActivity(name=texto, emoji=emoji)
             
             await client.change_presence(status=current_status, activity=activity)
             
-            # Salva a nova configuração
             bot_config.set_presence(current_status_str, "custom", texto, emoji=emoji)
             
             embed = discord.Embed(title="✅ Status Personalizado Definido!", description=f"O status foi alterado para: {emoji or ''} {texto}", color=0x00FF00)
