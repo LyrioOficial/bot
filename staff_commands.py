@@ -8,13 +8,9 @@ from datetime import datetime, timedelta
 from typing import Optional, Union
 from goodmorning import coin_system
 from config_system import config_system
-from automod_system import automod # <-- A importação agora funciona
+from automod_system import automod
 
-# ... (o resto do arquivo, incluindo a classe StaffCommands, permanece o mesmo) ...
-
-# ... (cole o restante do seu arquivo staff_commands.py que já estava funcionando aqui) ...
-
-# --- NOVA FUNÇÃO PARA CRIAR A REGRA VIA API ---
+# --- FUNÇÃO ATUALIZADA PARA CRIAR A REGRA VIA API DIRETA ---
 async def create_automod_rule_directly(interaction: discord.Interaction, name: str, keywords: list, action_metadata: dict):
     """Cria uma regra de AutoMod fazendo uma requisição direta para a API do Discord."""
     
@@ -35,8 +31,10 @@ async def create_automod_rule_directly(interaction: discord.Interaction, name: s
     
     # Usamos o cliente do bot para fazer a requisição, que já inclui o token de autorização
     try:
-        # Acessa o método http interno do client para fazer a requisição de API
-        await interaction.client.http.create_automod_rule(interaction.guild.id, json=payload, reason=f"Regra criada por {interaction.user}")
+        # Cria a rota da API manualmente
+        route = discord.http.Route('POST', '/guilds/{guild_id}/automod/rules', guild_id=interaction.guild.id)
+        # Usa o método de requisição genérico, que existe em todas as versões
+        await interaction.client.http.request(route, json=payload, reason=f"Regra criada por {interaction.user}")
         return True, None
     except discord.Forbidden:
         return False, "O bot não tem a permissão de 'Gerenciar Servidor' para criar esta regra."
@@ -265,6 +263,8 @@ def setup_staff_commands(tree: app_commands.CommandTree, client: discord.Client)
         else:
             embed = discord.Embed(title="❌ Erro ao Criar Regra", description=error_message, color=0xFF0000)
             await interaction.followup.send(embed=embed)
+
+    # O resto dos comandos de staff continua aqui, sem alterações...
 
     @tree.command(name="setlogchannel", description="🔧 [STAFF] Define o canal para receber os logs de moderação.")
     @app_commands.describe(channel="O canal de texto para onde os logs serão enviados.")
