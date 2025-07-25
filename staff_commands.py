@@ -1,6 +1,6 @@
 # staff_commands.py
 import discord
-from discord import app_commands
+from discord import app_commands, AutoModRule, AutoModTrigger, AutoModAction, AutoModRuleEventType, AutoModTriggerType, AutoModActionType
 from discord.ext import commands
 import json
 import os
@@ -10,38 +10,241 @@ from goodmorning import coin_system
 from config_system import config_system
 from automod_system import automod
 
-# --- FUNÇÃO ATUALIZADA PARA CRIAR A REGRA VIA API DIRETA ---
-async def create_automod_rule_directly(interaction: discord.Interaction, name: str, keywords: list, action_metadata: dict):
-    """Cria uma regra de AutoMod fazendo uma requisição direta para a API do Discord."""
-    
-    # Payload (corpo da requisição) conforme a documentação da API do Discord
-    payload = {
-        "name": name,
-        "event_type": 1,  # MESSAGE_SEND
-        "trigger_type": 1, # KEYWORD
-        "trigger_metadata": {
-            "keyword_filter": keywords
-        },
-        "actions": [{
-            "type": 1, # BLOCK_MESSAGE
-            "metadata": action_metadata
-        }],
-        "enabled": True
-    }
-    
-    # Usamos o cliente do bot para fazer a requisição, que já inclui o token de autorização
-    try:
-        # Cria a rota da API manualmente
-        route = discord.http.Route('POST', '/guilds/{guild_id}/automod/rules', guild_id=interaction.guild.id)
-        # Usa o método de requisição genérico, que existe em todas as versões
-        await interaction.client.http.request(route, json=payload, reason=f"Regra criada por {interaction.user}")
-        return True, None
-    except discord.Forbidden:
-        return False, "O bot não tem a permissão de 'Gerenciar Servidor' para criar esta regra."
-    except Exception as e:
-        return False, f"Um erro de API ocorreu: {e}"
+class StaffCommands:
+    def __init__(self):
+        self.staff_roles = ["Staff", "Moderador", "Admin", "Owner", "Administrador"]
+        self.log_file = "staff_logs.json"
+        self.warns_file = "user_warns.json"
+        self.mutes_file = "user_mutes.json"
+        self.ensure_files()
 
+    def ensure_files(self):
+        files = [self.log_file, self.warns_file, self.mutes_file]
+        for file in files:
+            if not os.path.exists(file):
+                with open(file, 'w', encoding='utf-8') as f:
+                    json.dump({} if file != self.log_file else [], f)
 
+    def log_action(self, staff_id: str, staff_name: str, action: str, target_id: str, target_name: str, amount: int = 0, reason: str = "", extra_data: str = ""):
+        try:
+            with open(self.log_file, 'r', encoding='utf-8') as f:
+                logs = json.load(f)
+        except:
+            logs = []
+        log_entry = {
+            "timestamp": datetime.now().isoformat(), "staff_id": staff_id, "staff_name": staff_name, "action": action,
+            "target_id": target_id, "target_name": target_name, "amount": amount, "reason": reason, "extra_data": extra_data
+        }
+        logs.append(log_entry)
+        if len(logs) > 1000:
+            logs = logs[-1000:]
+        with open(self.log_file, 'w', encoding='utf-8') as f:
+            json.dump(logs, f, indent=2, ensure_ascii=False)
+
+    def is_staff(self, member: Union[discord.Member, discord.User]) -> bool:
+        if isinstance(member, discord.User):
+            return False
+        if member.guild_permissions.administrator:
+            return True
+        for role in member.roles:
+            if role.name in self.staff_roles:
+                return True
+        return False
+
+    def get_logs(self, limit: int = 50):
+        try:
+            with open(self.log_file, 'r', encoding='utf-8') as f:
+                logs = json.load(f)
+            return logs[-limit:][::-1]
+        except:
+            return []
+
+    def add_warn(self, user_id: str, staff_id: str, reason: str):
+        try:
+            with open(self.warns_file, 'r', encoding='utf-8') as f:
+                warns = json.load(f)
+        except:
+            warns = {}
+        if user_id not in warns:
+            warns[user_id] = []
+        warn_data = {
+            "id": len(warns[user_id]) + 1, "timestamp": datetime.now().isoformat(), "staff_id": staff_id,
+            "reason": reason, "active": True
+        }
+        warns[user_id].append(warn_data)
+        with open(self.warns_file, 'w', encoding='utf-8') as f:
+            json.dump(warns, f, indent=2, ensure_ascii=False)
+        return len(warns[user_id])
+
+    def get_warns(self, user_id: str):
+        try:
+            with open(self.warns_file, 'r', encoding='utf-8') as f:
+                warns = json.load(f)
+            return warns.get(user_id, [])
+        except:
+            return []
+
+    def remove_warn(self, user_id: str, warn_id: int):
+        try:
+            with open(self.warns_file, 'r', encoding='utf-8') as f:
+                warns = json.load(f)
+        except:
+            return False
+        if user_id not in warns:
+            return False
+        for warn in warns[user_id]:
+            if warn["id"] == warn_id and warn["active"]:
+                warn["active"] = False
+                with open(self.warns_file, 'w', encoding='utf-8') as f:
+                    json.dump(warns, f, indent=2, ensure_ascii=False)
+                return True
+        return False
+
+    def add_mute(self, user_id: str, staff_id: str, duration: int, reason: str):
+        try:
+            with open(self.mutes_file, 'r', encoding='utf-8') as f:
+                mutes = json.load(f)
+        except:
+            mutes = {}
+        mute_until = datetime.now() + timedelta(minutes=duration)
+        mutes[user_id] = {
+            "timestamp": datetime.now().isoformat(), "staff_id": staff_id, "reason": reason,
+            "duration": duration, "mute_until": mute_until.isoformat(), "active": True
+        }
+        with open(self.mutes_file, 'w', encoding='utf-8') as f:
+            json.dump(mutes, f, indent=2, ensure_ascii=False)
+
+    def is_muted(self, user_id: str):
+        try:
+            with open(self.mutes_file, 'r', encoding='utf-8') as f:
+                mutes = json.load(f)
+        except:
+            return False
+        if user_id not in mutes: return False
+        mute_data = mutes[user_id]
+        if not mute_data.get("active", False): return False
+        mute_until = datetime.fromisoformat(mute_data["mute_until"])
+        if datetime.now() >= mute_until:
+            mute_data["active"] = False
+            with open(self.mutes_file, 'w', encoding='utf-8') as f:
+                json.dump(mutes, f, indent=2, ensure_ascii=False)
+            return False
+        return True
+
+    def unmute(self, user_id: str):
+        try:
+            with open(self.mutes_file, 'r', encoding='utf-8') as f:
+                mutes = json.load(f)
+        except:
+            return False
+        if user_id not in mutes: return False
+        mutes[user_id]["active"] = False
+        with open(self.mutes_file, 'w', encoding='utf-8') as f:
+            json.dump(mutes, f, indent=2, ensure_ascii=False)
+        return True
+
+staff_system = StaffCommands()
+
+async def send_log_message(interaction: discord.Interaction, embed: discord.Embed):
+    log_channel_id = config_system.get_log_channel(str(interaction.guild.id))
+    if log_channel_id:
+        try:
+            log_channel = interaction.guild.get_channel(log_channel_id)
+            if log_channel and isinstance(log_channel, discord.TextChannel):
+                await log_channel.send(embed=embed)
+        except (discord.Forbidden, discord.NotFound):
+            pass
+        except Exception as e:
+            print(f"Erro ao enviar log: {e}")
+
+# A assinatura da função foi alterada para não precisar mais do 'client'
+def setup_staff_commands(tree: app_commands.CommandTree):
+    
+    automod_group = app_commands.Group(name="automod", description="Comandos para configurar o sistema de moderação automática.")
+
+    @automod_group.command(name="reload", description="🛡️ [Admin] Recarrega as configurações do AutoMod do arquivo settings.json.")
+    async def reload_automod(interaction: discord.Interaction):
+        if not interaction.user.guild_permissions.administrator:
+            return await interaction.response.send_message("❌ Apenas administradores podem usar este comando.", ephemeral=True)
+        
+        automod.reload_settings()
+        await interaction.response.send_message("✅ Configurações do AutoMod recarregadas com sucesso.", ephemeral=True)
+
+    @automod_group.command(name="add-keyword", description="🛡️ [Admin] Adiciona uma palavra-chave à lista de filtros.")
+    @app_commands.describe(palavra="A palavra a ser bloqueada.")
+    async def add_keyword(interaction: discord.Interaction, palavra: str):
+        if not interaction.user.guild_permissions.administrator:
+            return await interaction.response.send_message("❌ Apenas administradores podem usar este comando.", ephemeral=True)
+        
+        keyword = palavra.lower().strip()
+        if keyword not in automod.settings['nsfw_keywords']:
+            automod.settings['nsfw_keywords'].append(keyword)
+            automod.save_settings()
+            await interaction.response.send_message(f"✅ Palavra-chave `{keyword}` adicionada ao filtro.", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"⚠️ A palavra-chave `{keyword}` já está no filtro.", ephemeral=True)
+
+    @automod_group.command(name="remove-keyword", description="🛡️ [Admin] Remove uma palavra-chave da lista de filtros.")
+    @app_commands.describe(palavra="A palavra a ser removida.")
+    async def remove_keyword(interaction: discord.Interaction, palavra: str):
+        if not interaction.user.guild_permissions.administrator:
+            return await interaction.response.send_message("❌ Apenas administradores podem usar este comando.", ephemeral=True)
+        
+        keyword = palavra.lower().strip()
+        if keyword in automod.settings['nsfw_keywords']:
+            automod.settings['nsfw_keywords'].remove(keyword)
+            automod.save_settings()
+            await interaction.response.send_message(f"✅ Palavra-chave `{keyword}` removida do filtro.", ephemeral=True)
+        else:
+            await interaction.response.send_message(f"❌ A palavra-chave `{keyword}` não foi encontrada.", ephemeral=True)
+    
+    tree.add_command(automod_group)
+
+    @tree.command(name="automod-rule-create", description="🛡️ [Admin] Cria uma regra do AutoMod para obter a badge.")
+    @app_commands.describe(
+        nome="O nome da regra (ex: Filtro de Palavras)",
+        palavras="Palavras a serem bloqueadas, separadas por vírgula (ex: palavra1,palavra2)",
+        canal_log="[Opcional] Canal para enviar os alertas do AutoMod."
+    )
+    async def automod_rule_create(interaction: discord.Interaction, nome: str, palavras: str, canal_log: Optional[discord.TextChannel] = None):
+        if not interaction.user.guild_permissions.manage_guild:
+            return await interaction.response.send_message("❌ Apenas admins com 'Gerenciar Servidor' podem usar isto.", ephemeral=True)
+        
+        await interaction.response.defer(ephemeral=True)
+
+        try:
+            keyword_list = [k.strip() for k in palavras.split(',') if k.strip()]
+            if not keyword_list:
+                return await interaction.followup.send("❌ Você precisa fornecer pelo menos uma palavra-chave.", ephemeral=True)
+                
+            trigger = discord.AutoModTrigger(trigger_type=discord.AutoModTriggerType.keyword, keyword_filter=keyword_list)
+            
+            action = discord.AutoModAction(
+                action_type=discord.AutoModActionType.block_message,
+                alert_channel_id=canal_log.id if canal_log else None
+            )
+
+            await interaction.guild.create_automod_rule(
+                name=nome,
+                event_type=discord.AutoModRuleEventType.message_send,
+                trigger=trigger,
+                actions=[action],
+                enabled=True,
+                reason=f"Regra criada por {interaction.user} para elegibilidade da badge do bot."
+            )
+            
+            embed = discord.Embed(title="✅ Regra do AutoMod Criada!", description=f"A regra '{nome}' foi criada com sucesso.", color=0x00FF00)
+            await interaction.followup.send(embed=embed)
+
+        except discord.Forbidden:
+            embed = discord.Embed(title="❌ Erro de Permissão", description="Verifique se o bot tem a permissão de **'Gerenciar Servidor'**.", color=0xFF0000)
+            await interaction.followup.send(embed=embed)
+        except Exception as e:
+            await interaction.followup.send(f"❌ Ocorreu um erro inesperado: {e}", ephemeral=True)
+
+    # ... (O resto dos seus comandos de staff continua aqui)
+
+# --- CLASSE DE COMANDOS DE STAFF ---
 class StaffCommands:
     def __init__(self):
         self.staff_roles = ["Staff", "Moderador", "Admin", "Owner", "Administrador"]

@@ -53,19 +53,11 @@ async def on_ready():
     
     # Configura todos os grupos de comandos
     setup_goodmorning_command(tree)
-    setup_staff_commands(tree, client)
+    setup_staff_commands(tree) # <-- MUDANÇA AQUI: 'client' foi removido
     setup_bot_commands(tree, client)
     setup_help_command(tree)
     setup_embed_builder_command(tree)
     
-    # --- ETAPA TEMPORÁRIA PARA SINCRONIZAR OS COMANDOS ---
-    try:
-        synced = await tree.sync()
-        print(f"Sincronizados {len(synced)} comandos")
-    except Exception as e:
-        print(f"Erro ao sincronizar comandos: {e}")
-    # ----------------------------------------------------
-
     print("Bot pronto para receber comandos.")
 
 @client.event
