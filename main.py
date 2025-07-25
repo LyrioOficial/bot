@@ -13,7 +13,7 @@ from bot_config import bot_config
 from automod_system import automod # <-- MUDANÇA AQUI: Importa a instância global
 
 # Substitua 'SEU_TOKEN_AQUI' pelo token do seu bot
-TOKEN = 'MTI0NDI4ODQ0MTkyNDE5NDMxNA.Gw5jhq.UP_1hr5VS2VwWgn6O5yJARi_KzpXhBAa_smoOg'
+TOKEN = 'token'
 
 intents = discord.Intents.default()
 intents.message_content = True 
