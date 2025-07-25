@@ -1,0 +1,25 @@
+{
+    "738138438447923382": {
+        "coins": 10828,
+        "last_daily": "2025-07-13T20:37:56.618225",
+        "total_earned": 60828,
+        "last_new_phrase": "2025-07-13T20:37:55.007484"
+    },
+    "1097191404121370757": {
+        "coins": 88,
+        "last_daily": "2025-06-24T20:09:43.346032",
+        "total_earned": 88,
+        "last_new_phrase": "2025-06-24T20:09:54.446380",
+        "roleplay_counts": {
+            "kiss": 1
+        }
+    },
+    "1284311938465267856": {
+        "coins": 0,
+        "last_daily": null,
+        "total_earned": 25000,
+        "roleplay_counts": {
+            "kiss": 5
+        }
+    }
+}

@@ -1,0 +1,32 @@
+{
+  "1097191404121370757": [
+    {
+      "id": 1,
+      "timestamp": "2025-06-24T18:39:37.546318",
+      "staff_id": "738138438447923382",
+      "reason": "bobao",
+      "active": false
+    },
+    {
+      "id": 2,
+      "timestamp": "2025-06-26T19:18:56.792586",
+      "staff_id": "738138438447923382",
+      "reason": "importunando novos membros",
+      "active": false
+    },
+    {
+      "id": 3,
+      "timestamp": "2025-06-26T19:22:52.653764",
+      "staff_id": "738138438447923382",
+      "reason": "sa",
+      "active": false
+    },
+    {
+      "id": 4,
+      "timestamp": "2025-07-05T19:18:14.694380",
+      "staff_id": "738138438447923382",
+      "reason": "dsa",
+      "active": true
+    }
+  ]
+}

@@ -1,0 +1,154 @@
+[
+  {
+    "timestamp": "2025-06-24T18:28:44.971383",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "738138438447923382",
+    "target_name": "arbitrariedade",
+    "amount": 20,
+    "reason": "Não especificado"
+  },
+  {
+    "timestamp": "2025-06-24T18:32:11.817711",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "738138438447923382",
+    "target_name": "arbitrariedade",
+    "amount": 20,
+    "reason": "vai se foder"
+  },
+  {
+    "timestamp": "2025-06-24T18:39:37.548578",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "WARN",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 1,
+    "reason": "bobao",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T18:41:49.309699",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "MUTE",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 60,
+    "reason": "nao",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T18:42:50.396385",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "MUTE",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 20,
+    "reason": "s",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T20:22:53.211501",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "738138438447923382",
+    "target_name": "arbitrariedade",
+    "amount": 1,
+    "reason": "Não especificado",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T21:52:52.462172",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "MUTE",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 1,
+    "reason": "bobao, de novo",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T22:20:25.589589",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "738138438447923382",
+    "target_name": "arbitrariedade",
+    "amount": 10000,
+    "reason": "Não especificado",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T22:25:11.788972",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "738138438447923382",
+    "target_name": "arbitrariedade",
+    "amount": 25000,
+    "reason": "Não especificado",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T22:49:42.379569",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "738138438447923382",
+    "target_name": "arbitrariedade",
+    "amount": 25000,
+    "reason": "Não especificado",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-24T22:49:57.555209",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "ADD_COINS",
+    "target_id": "1284311938465267856",
+    "target_name": "giu38172",
+    "amount": 25000,
+    "reason": "pq te amo",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-26T19:18:56.793048",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "WARN",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 2,
+    "reason": "importunando novos membros",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-06-26T19:22:52.656421",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "WARN",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 3,
+    "reason": "sa",
+    "extra_data": ""
+  },
+  {
+    "timestamp": "2025-07-05T19:18:14.694954",
+    "staff_id": "738138438447923382",
+    "staff_name": "arbitrariedade",
+    "action": "WARN",
+    "target_id": "1097191404121370757",
+    "target_name": "nadaxnada",
+    "amount": 4,
+    "reason": "dsa",
+    "extra_data": ""
+  }
+]
