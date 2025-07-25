@@ -10,7 +10,7 @@ from bot_commands import setup_bot_commands
 from help_command import setup_help_command
 from embed_builder_command import setup_embed_builder_command
 from bot_config import bot_config
-from automod_system import automod # <-- MUDANÇA AQUI: Importa a instância global
+from automod_system import automod
 
 # Substitua 'SEU_TOKEN_AQUI' pelo token do seu bot
 TOKEN = 'token'
@@ -23,14 +23,10 @@ intents.members = True
 client = discord.Client(intents=intents)
 tree = app_commands.CommandTree(client)
 
-# REMOVIDO: A instância agora é global no automod_system.py
-# automod = AutoModSystem(client)
-
 @client.event
 async def on_ready():
     print(f'Bot logado como {client.user}')
 
-    # --- MUDANÇA: Atribui o client à instância global do automod ---
     automod.client = client
     
     try:
@@ -62,6 +58,14 @@ async def on_ready():
     setup_help_command(tree)
     setup_embed_builder_command(tree)
     
+    # --- ETAPA TEMPORÁRIA PARA SINCRONIZAR OS COMANDOS ---
+    try:
+        synced = await tree.sync()
+        print(f"Sincronizados {len(synced)} comandos")
+    except Exception as e:
+        print(f"Erro ao sincronizar comandos: {e}")
+    # ----------------------------------------------------
+
     print("Bot pronto para receber comandos.")
 
 @client.event
