@@ -9,11 +9,10 @@ COMMAND_CATEGORIES = {
     "interactions": ["interagir"],
     "marriage": ["casar", "divorciar"],
     "staff": [
-        "addcoins", "warn", "warns", "ban", "kick", "mute", 
-        "clear", "serverinfo", "setlogchannel", "removelogchannel",
-        "embed"
+        "automod", "addcoins", "warn", "warns", "ban", "kick", "mute", 
+        "clear", "serverinfo", "setlogchannel", "removelogchannel", "embed"
     ],
-    "bot_config": ["setstatus", "clearactivity", "sync", "customstatus"]
+    "bot_config": ["setstatus", "clearactivity", "sync", "customstatus", "Extrair JSON do Embed"]
 }
 
 # Detalhes para a formatação de cada categoria no embed
@@ -82,6 +81,10 @@ class HelpView(ui.View):
             if not parameters: return ""
             param_parts = [f"<{p.display_name}>" if p.required else f"[{p.display_name}]" for p in parameters]
             return " " + " ".join(param_parts)
+        
+        if isinstance(cmd, app_commands.ContextMenu):
+            # Descrição atualizada para refletir a nova funcionalidade
+            return f"`{cmd.name}` - (Clique com botão direito > Apps) - Extrai os dados de embeds e componentes de uma mensagem."
 
         if isinstance(cmd, app_commands.Group):
             group_desc = f"`/{cmd.name}` - {cmd.description}"

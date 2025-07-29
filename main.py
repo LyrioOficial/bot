@@ -9,8 +9,9 @@ from staff_commands import setup_staff_commands
 from bot_commands import setup_bot_commands
 from help_command import setup_help_command
 from embed_builder_command import setup_embed_builder_command
+from utility_commands import setup_utility_commands # <--- ADICIONADO
 from bot_config import bot_config
-# A importação do automod foi removida
+from automod_system import automod
 
 # Substitua 'SEU_TOKEN_AQUI' pelo token do seu bot
 TOKEN = 'token'
@@ -27,6 +28,8 @@ tree = app_commands.CommandTree(client)
 async def on_ready():
     print(f'Bot logado como {client.user}')
 
+    automod.client = client
+    
     try:
         presence_data = bot_config.get_presence()
         if presence_data:
@@ -51,14 +54,17 @@ async def on_ready():
     
     # Configura todos os grupos de comandos
     setup_goodmorning_command(tree)
-    setup_staff_commands(tree) # A passagem do client foi removida
+    setup_staff_commands(tree)
     setup_bot_commands(tree, client)
     setup_help_command(tree)
     setup_embed_builder_command(tree)
+    setup_utility_commands(tree) # <--- ADICIONADO
     
     print("Bot pronto para receber comandos.")
 
-# O evento on_message foi removido pois era usado apenas pelo AutoMod
+@client.event
+async def on_message(message: discord.Message):
+    await automod.check_message(message)
 
 class HelloView(discord.ui.View):
     def __init__(self, user_mention: str):
