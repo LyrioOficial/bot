@@ -9,8 +9,9 @@ COMMAND_CATEGORIES = {
     "interactions": ["interagir"],
     "marriage": ["casar", "divorciar"],
     "staff": [
-        "automod", "automod-rule-create", "addcoins", "warn", "warns", "ban", "kick", "mute", 
-        "clear", "serverinfo", "setlogchannel", "removelogchannel", "embed"
+        "addcoins", "warn", "warns", "ban", "kick", "mute", 
+        "clear", "serverinfo", "setlogchannel", "removelogchannel",
+        "embed"
     ],
     "bot_config": ["setstatus", "clearactivity", "sync", "customstatus"]
 }
