@@ -2,3 +2,4 @@ discord.py
 requests
 pypresence
 python-dotenv
+aiohttp

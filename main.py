@@ -2,6 +2,7 @@
 import discord
 from discord import app_commands
 from typing import Optional
+import os # <-- Adicionado para carregar o .env
 
 # Importa as funções de setup
 from goodmorning import setup_goodmorning_command
@@ -9,12 +10,12 @@ from staff_commands import setup_staff_commands
 from bot_commands import setup_bot_commands
 from help_command import setup_help_command
 from embed_builder_command import setup_embed_builder_command
-from utility_commands import setup_utility_commands # <--- ADICIONADO
+from utility_commands import setup_utility_commands
 from bot_config import bot_config
 from automod_system import automod
 
-# Substitua 'SEU_TOKEN_AQUI' pelo token do seu bot
-TOKEN = 'token'
+# --- MUDANÇA: Carrega o token de forma segura ---
+TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
 intents.message_content = True 
@@ -58,7 +59,7 @@ async def on_ready():
     setup_bot_commands(tree, client)
     setup_help_command(tree)
     setup_embed_builder_command(tree)
-    setup_utility_commands(tree) # <--- ADICIONADO
+    setup_utility_commands(tree)
     
     print("Bot pronto para receber comandos.")
 
