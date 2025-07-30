@@ -2,7 +2,11 @@
 import discord
 from discord import app_commands
 from typing import Optional
-import os # <-- Adicionado para carregar o .env
+import os
+from dotenv import load_dotenv # É bom manter, pois funciona em outros ambientes
+
+# Carrega as variáveis do arquivo .env (se existir)
+load_dotenv()
 
 # Importa as funções de setup
 from goodmorning import setup_goodmorning_command
@@ -14,7 +18,7 @@ from utility_commands import setup_utility_commands
 from bot_config import bot_config
 from automod_system import automod
 
-# --- MUDANÇA: Carrega o token de forma segura ---
+# Carrega o token de forma segura do ambiente (Discloud ou .env)
 TOKEN = os.getenv("DISCORD_TOKEN")
 
 intents = discord.Intents.default()
@@ -102,4 +106,9 @@ async def hello_command(interaction: discord.Interaction):
     if interaction.user.avatar: embed.set_footer(text=embed.footer.text, icon_url=interaction.user.avatar.url)
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-client.run(TOKEN)
+# --- VERIFICAÇÃO DE SEGURANÇA ANTES DE INICIAR ---
+if TOKEN:
+    client.run(TOKEN)
+else:
+    print("ERRO CRÍTICO: O token do Discord não foi encontrado.")
+    print("Verifique se você criou o arquivo 'discloud.config' e adicionou a linha 'BOT_TOKEN=SEU_TOKEN'.")
